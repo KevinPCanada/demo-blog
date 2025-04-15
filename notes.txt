@@ -1,0 +1,24 @@
+    ****React Quill****
+
+We're using something called React-quill which is apparently a library that is good to use with text editors.
+
+https://github.com/zenoamaro/react-quill?tab=readme-ov-file#quick-start
+
+I'll need to change this later to https://quilljs.com/docs/configuration
+
+    ****Password Encyption: bcrypt.js****
+
+https://www.npmjs.com/package/bcrypt
+
+npm install -g node-gyp
+npm install bcrypt
+
+    // Hash the Password and create a user
+    const salt = bcrypt.genSaltSync(saltRounds);
+    const hash = bcrypt.hashSync(myPlaintextPassword, salt);
+
+    ****Axios: Make API calls****
+
+https://axios-http.com/
+
+npm install axios

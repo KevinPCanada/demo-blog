@@ -1,0 +1,117 @@
+.navbar {
+  background-color: var(--background-color);
+  
+  .container {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    position: relative;
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      text-decoration: none;
+
+      a {
+        text-decoration: none;
+
+        h1 {
+          font-weight: -200;
+          color: #333;
+          font-size: 80px;
+          font-family: 'Fraunces', sans-serif;
+        }
+      }
+
+      .toggle-arrow {
+        margin-top: 30px;
+        font-size: 20px;
+        color: var(--text-color);
+        cursor: pointer;
+        transition: transform 0.3s ease; /* Transition for rotation */
+      }
+
+      /* Rotate the arrow 180 degrees when 'rotate' class is applied */
+      .rotate {
+        transform: rotate(180deg);
+      }
+    }
+
+    .links {
+      display: flex;
+      max-height: 0;
+      overflow: hidden;
+      gap: 25px;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: max-height 0.5s ease, opacity 0.5s ease, transform 0.5s ease;
+
+      &.visible {
+        max-height: 500px;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      a {
+        font-family: 'Fraunces', sans-serif;
+        text-decoration: none;
+        font-size: 25px;
+        color: var(--text-color);
+        transition: color 0.3s ease, transform 0.3s ease;
+        padding: 5px 0;
+
+        &:hover {
+          color: var(--hover-color);
+          transform: translateY(-5px);
+        }
+      }
+
+      span {
+        font-family: 'Fraunces', sans-serif;
+        font-size: 25px;
+        color: var(--text-color);
+        cursor: pointer;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: var(--hover-color);
+        }
+      }
+
+      /* Modified .write styles to apply to both the span and the link inside */
+      .write {
+        
+        padding: 5px 10px;
+        background-color: var(--accent-color);
+        border-radius: 25px;
+
+        a {
+          color: var(--background-color);
+        }
+      }
+
+      /* Added styles for auth-button to ensure consistent styling for login/logout */
+      .auth-button {
+        font-family: 'Fraunces', sans-serif;
+        font-size: 25px;
+        color: var(--text-color);
+        cursor: pointer;
+        transition: color 0.3s ease, transform 0.3s ease;
+        background: none;
+        border: none;
+        padding: 0;
+
+        &:hover {
+          color: var(--hover-color);
+          transform: translateY(-5px);
+        }
+      }
+    }
+  }
+}

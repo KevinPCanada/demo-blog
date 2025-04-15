@@ -1,0 +1,146 @@
+.single {
+  display: flex;
+  gap: 50px;
+
+  .content {
+    flex: 5;
+
+    .post-container {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      background-color: var(--background-color);
+    }
+
+    .primary-image-container {
+      display: flex;
+      padding-top: 15px;
+      justify-content: center;
+      width: 100%;
+      height: calc(80vh - 170px);
+      /* overflow: hidden; */
+
+      img {
+        width: 80%;
+        object-fit: cover;
+        object-position: center;
+      }
+    }
+
+    .post-header {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+
+      img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .info {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+
+        span {
+          font-weight: bold;
+          color: var(--text-color);
+        }
+
+        p {
+          font-size: 14px;
+          color: var(--link-color);
+        }
+      }
+
+      .edit {
+        display: flex;
+        gap: 10px;
+
+        button {
+          padding: 5px 10px;
+          border: 1px solid var(--border-color);
+          background-color: transparent;
+          cursor: pointer;
+          color: var(--text-color);
+
+          &:hover {
+            background-color: var(--hover-color-achromatic);
+            color: white;
+          }
+        }
+      }
+    }
+
+    .post-content {
+      padding: 20px 40px;
+
+      h1 {
+        font-family: var(--heading-font);
+        font-size: 42px;
+        color: var(--heading-color);
+        margin-bottom: 40px;
+        text-align: center;
+      }
+
+      .article-body {
+        columns: 4;
+        column-gap: 40px;
+        column-rule: 1px solid var(--border-color);
+        
+        
+        /* Style Quill content */
+        p, h1, h2, h3, h4, h5, h6 {
+          margin-bottom: 1em;
+          break-inside: avoid; /* Prevents headings from breaking across columns */
+        }
+      
+        p {
+          line-height: 1.8;
+          color: var(--text-color);
+          font-family: var(--body-font);
+          text-align: justify;
+        }
+      
+        /* Handle other Quill-generated elements */
+        ul, ol {
+          margin-bottom: 1em;
+          padding-left: 1.5em;
+        }
+      
+        blockquote {
+          border-left: 3px solid var(--border-color);
+          padding-left: 1em;
+          margin: 1em 0;
+          font-style: italic;
+        }
+      }
+    }
+
+    .menu {
+      flex: 2;
+    }
+  }
+    /* Responsive breakpoints */
+    @media screen and (max-width: 1200px) {
+      .post-content .article-body {
+        columns: 2;
+      }
+    }
+  
+    @media screen and (max-width: 768px) {
+      .post-content .article-body {
+        columns: 1;
+      }
+    }
+}
