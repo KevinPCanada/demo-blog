@@ -12,6 +12,9 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# Ignore user-uploaded content
+public/uploads/
+
 # Environment variables file (if you use one later)
 # .env
 # .env.local

@@ -3,13 +3,51 @@ import { db } from "../db.js"; // Make sure db.js exports your database connecti
 import jwt from "jsonwebtoken"; // For verifying the JWT
 
 export const getPosts = (req, res) => {
-  // ... (your existing or future code)
+  // We want to get all posts. For the homepage, we might also want author info.
+  // Let's select post details and include the username of the author.
+  // We also want to retrieve the 'description' field for the card snippets.
+  const q = `
+    SELECT p.*, u.username AS authorName 
+    FROM posts AS p 
+    JOIN users AS u ON p.uid = u.id 
+    ORDER BY p.date DESC
+  `;
+  // If you only want posts from a specific category, you can add a WHERE clause
+  // e.g., const q = req.query.cat ? "SELECT * FROM posts WHERE cat=? ORDER BY date DESC" : "SELECT * FROM posts ORDER BY date DESC";
+  // For now, we'll fetch all.
+
+  db.query(q, (err, data) => {
+    if (err) {
+      console.error("Database query error in getPosts:", err);
+      return res.status(500).json(err);
+    }
+    if (data.length === 0) {
+      return res.status(200).json([]); // Send empty array if no posts
+    }
+    return res.status(200).json(data);
+  });
 };
 
+// ... your other post controller functions (getPost, addPost, deletePost, updatePost) ...
+// ensure getPost is also defined for when you click "Read More" later
 export const getPost = (req, res) => {
-  res.json("from controller");
-};
+  const q = `
+    SELECT p.id, p.title, p.description, p.content, p.img, p.cat, p.date, p.uid, 
+           u.username AS authorName, u.img AS authorImg 
+    FROM posts p 
+    JOIN users u ON p.uid = u.id 
+    WHERE p.id = ?
+  `;
 
+  db.query(q, [req.params.id], (err, data) => {
+    if (err) {
+      console.error("Error fetching single post:", err);
+      return res.status(500).json(err);
+    }
+    if (data.length === 0) return res.status(404).json("Post not found!");
+    return res.status(200).json(data[0]); // Send the single post object
+  });
+};
 export const addPost = (req, res) => {
   // 1. VERIFY USER AUTHENTICATION (JWT)
   const token = req.cookies.access_token;
