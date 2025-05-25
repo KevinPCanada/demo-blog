@@ -1,6 +1,6 @@
 // client/src/pages/Single/Single.jsx
 import React, { useEffect, useState, useContext } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom"; // Ensure useNavigate is imported
 import moment from "moment";
 import { AuthContext } from "../../context/authContext.jsx";
 import "./Single.css";
@@ -8,45 +8,35 @@ import "./Single.css";
 export default function Single() {
   const [post, setPost] = useState({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(null); // State to display errors in your UI
 
   const location = useLocation();
-  const navigate = useNavigate(); // Make sure navigate is defined if you use it (e.g. in handleDelete)
+  const navigate = useNavigate(); // Initialize navigate
   const postId = location.pathname.split("/")[2];
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext); // For checking ownership
 
-  const backendUrl = "http://localhost:8800"; // Centralize backend URL
+  const backendUrl = "http://localhost:8800"; // Your backend URL
 
+  // useEffect for fetching post data (fetchData function) should be here...
+  // (Assuming your fetchData function is already implemented and working)
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
-      let rawResponseText = '';
-
-      console.log("Attempting to fetch post with ID:", postId);
-
+      // ... your existing fetchData logic ...
       try {
-        // Using absolute URL to ensure it bypasses potential Vite proxy issues for now
         const response = await fetch(`${backendUrl}/api/posts/${postId}`);
-        rawResponseText = await response.text();
-
+        // ... rest of fetch and error handling ...
         if (!response.ok) {
-          let errorMsg = `HTTP error! Status: ${response.status}. Response: ${rawResponseText.substring(0, 200)}...`;
-          try {
-            const errorData = JSON.parse(rawResponseText);
-            errorMsg = errorData.message || errorData.error || JSON.stringify(errorData);
-          } catch (jsonParseError) {
-            console.warn("Response was not OK and not valid JSON. Raw response:", rawResponseText);
-          }
-          throw new Error(errorMsg);
+            // ... error handling for fetch ...
+            const errorData = await response.json().catch(() => ({ message: `HTTP error! Status: ${response.status}`}));
+            throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
         }
-        const data = JSON.parse(rawResponseText);
+        const data = await response.json();
         setPost(data);
       } catch (err) {
-        console.error("Error during fetch operation for post ID:", postId);
-        console.error("Raw response text that caused error (if any):", rawResponseText);
-        console.error("Full error object:", err);
-        setError(`Failed to process post data: ${err.message}. Check console for raw response.`);
+        console.error("Error fetching post:", err);
+        setError(err.message || "Failed to fetch post.");
       }
       setLoading(false);
     };
@@ -57,63 +47,82 @@ export default function Single() {
       setError("No post ID found in URL.");
       setLoading(false);
     }
-  }, [postId, backendUrl]); // Added backendUrl to dependency array as it's used in effect
+  }, [postId, backendUrl]);
 
-  // Ensure handleDelete is defined if used
+
+  // --- DELETE POST FUNCTIONALITY ---
   const handleDelete = async () => {
-    // ... your delete logic ...
-    // Remember to use `${backendUrl}/api/posts/${postId}` for the delete request too
-    console.log("Delete button clicked - implement handleDelete function");
-     try {
+    if (!currentUser) {
+      alert("Please log in to delete posts.");
+      setError("You must be logged in to delete posts.");
+      return;
+    }
+
+    // Optional: Add a confirmation dialog for better UX
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this post and its associated image? This action cannot be undone."
+    );
+
+    if (!confirmDelete) {
+      return; // User cancelled the deletion
+    }
+
+    setError(null); // Clear previous errors before new attempt
+
+    try {
       const response = await fetch(`${backendUrl}/api/posts/${postId}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        // credentials: 'include', // If using cookies and backend is on different origin and CORS configured
+        // Headers like 'Content-Type' are not typically needed for a DELETE request without a body
+        credentials: "include", // VERY IMPORTANT: To send the access_token cookie
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Failed to delete and parse error response' }));
+        // Try to parse error message from backend if available
+        const errorData = await response.json().catch(() => ({ // .catch for cases where response isn't valid JSON
+          message: `Failed to delete post. Server responded with status: ${response.status}`
+        }));
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
-      console.log("Post deleted successfully");
-      navigate("/"); 
+
+      // Backend should send a JSON success message, e.g., { message: "Post deleted." }
+      // Or if it sends plain text as in the example "Post and associated image have been deleted."
+      const responseText = await response.text(); // Or response.json() if backend sends JSON
+      console.log("Delete response from server:", responseText);
+
+      alert(responseText || "Post deleted successfully!"); // Show success message
+      navigate("/"); // Navigate to the homepage (or another appropriate page)
+
     } catch (err) {
       console.error("Error deleting post:", err);
-      setError(err.message || "Failed to delete post.");
+      setError(err.message || "Failed to delete post. Please try again.");
+      alert(`Error: ${err.message}`); // Show error to the user
     }
   };
+  // --- END OF DELETE POST FUNCTIONALITY ---
 
 
+  // Loading and error states rendering...
   if (loading) {
     return <div className="single">Loading post...</div>;
   }
-  if (error) {
+  if (error) { // Display error messages from either fetching or deleting
     return (
       <div className="single">
-        <p>Error: {error}</p>
+        <p style={{ color: 'red' }}>Error: {error}</p>
         <Link to="/">Go back home</Link>
       </div>
     );
   }
   if (!post || Object.keys(post).length === 0) {
-    return (
-      <div className="single">
-        <p>Post not found or unable to display.</p>
-        <Link to="/">Go back home</Link>
-      </div>
-    );
+    // This check might need adjustment if an empty post is a valid state briefly
+    // For now, assuming an empty 'post' after loading and no error means 'not found' or issue
+    return ( <div className="single">Post not found.</div> );
   }
 
+  // Image URL construction...
   const placeholderUserImg = "https://via.placeholder.com/50";
   const placeholderPostImg = "https://via.placeholder.com/800x400?text=Blog+Post+Image";
-
-  const postImageSrc = post.img
-    ? `${backendUrl}${post.img}` // Use backendUrl + path from DB
-    : placeholderPostImg;
-
-  const authorImageSrc = placeholderUserImg; // Always use placeholder as we don't have authorImg from API
+  const postImageSrc = post.img ? `${backendUrl}${post.img}` : placeholderPostImg;
 
   return (
     <div className="single">
@@ -125,25 +134,31 @@ export default function Single() {
           <div className="post-header">
             <div className="user">
               <div className="info">
-                <span>By {post.authorName || "Unknown Author"}</span>
+                <span>{post.authorName || "Unknown Author"}</span>
                 <p>Posted {post.date ? moment(post.date).fromNow() : "a while ago"}</p>
               </div>
-              {currentUser && post.uid === currentUser.id && ( // Check uid against currentUser.id
+              {/* Edit and Delete Buttons */}
+              {currentUser && post.uid === currentUser.id && (
                 <div className="edit">
                   <Link to={`/write?edit=${post.id}`} state={post}>
                     <button>Edit</button>
                   </Link>
-                  <button onClick={handleDelete}>Delete</button>
+                  <button onClick={handleDelete}>Delete</button> {/* This calls the function */}
                 </div>
               )}
             </div>
           </div>
           <div className="post-content">
             <h1>{post.title}</h1>
-            <div className="article-body" dangerouslySetInnerHTML={{ __html: post.content || "" }} />
+            <div
+              className="article-body"
+              dangerouslySetInnerHTML={{ __html: post.content || "" }}
+            />
           </div>
         </article>
       </div>
+      {/*  can add a Menu component here later if needed */}
+      {/* <Menu category={post.category}/> */}
     </div>
   );
 }

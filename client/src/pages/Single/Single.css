@@ -94,7 +94,7 @@
       }
 
       .article-body {
-        columns: 4;
+        columns: 2;
         column-gap: 40px;
         column-rule: 1px solid var(--border-color);
         
