@@ -28,32 +28,43 @@ export const getPosts = (req, res) => {
   });
 };
 
-// ... your other post controller functions (getPost, addPost, deletePost, updatePost) ...
-// ensure getPost is also defined for when you click "Read More" later
 export const getPost = (req, res) => {
+  const postId = req.params.id;
+  // console.log(`Backend: Fetching post with ID: ${postId}`); 
+
   const q = `
-    SELECT p.id, p.title, p.description, p.content, p.img, p.cat, p.date, p.uid, 
-           u.username AS authorName, u.img AS authorImg 
+    SELECT p.id, p.title, p.description, p.content, p.img, 
+           p.category,
+           p.date, p.uid, 
+           u.username AS authorName
     FROM posts p 
     JOIN users u ON p.uid = u.id 
     WHERE p.id = ?
   `;
 
-  db.query(q, [req.params.id], (err, data) => {
+  db.query(q, [postId], (err, data) => {
     if (err) {
-      console.error("Error fetching single post:", err);
-      return res.status(500).json(err);
+      console.error("Database error fetching single post:", err);
+      return res
+        .status(500)
+        .json({ message: "Database error occurred.", error: err.message });
     }
-    if (data.length === 0) return res.status(404).json("Post not found!");
-    return res.status(200).json(data[0]); // Send the single post object
+    if (data.length === 0) {
+      // console.log(`Backend: Post not found for ID: ${postId}`); 
+      return res.status(404).json({ message: "Post not found!" });
+    }
+    // console.log(`Backend: Successfully fetched post ID: ${postId}`); 
+    return res.status(200).json(data[0]);
   });
 };
+
 export const addPost = (req, res) => {
   // 1. VERIFY USER AUTHENTICATION (JWT)
   const token = req.cookies.access_token;
   if (!token) return res.status(401).json("Not authenticated!");
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => { // Ensure "jwtkey" is your actual secret
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    // Ensure "jwtkey" is your actual secret
     if (err) return res.status(403).json("Token is not valid!");
 
     // 2. PREPARE THE SQL QUERY
@@ -67,10 +78,10 @@ export const addPost = (req, res) => {
     const values = [
       req.body.title,
       req.body.img,
-      req.body.content,       // This is from ReactQuill
+      req.body.content, // This is from ReactQuill
       req.body.description,
       req.body.category,
-      userInfo.id,          // Extracted from the JWT
+      userInfo.id, // Extracted from the JWT
     ];
 
     // 3. EXECUTE THE QUERY
@@ -90,33 +101,39 @@ export const deletePost = (req, res) => {
 };
 
 export const updatePost = (req, res) => {
-  // 1. VERIFY USER AUTHENTICATION (JWT)
-  const token = req.cookies.access_token; // Or however you're sending the token
+  const token = req.cookies.access_token;
   if (!token) return res.status(401).json("Not authenticated!");
 
-  jwt.verify(token, "your_jwt_secret_key", (err, userInfo) => {
+  // IMPORTANT: Ensure this JWT key is the SAME as in addPost ("jwtkey")
+  jwt.verify(token, "jwtkey", (err, userInfo) => { // USE CONSISTENT JWT KEY
     if (err) return res.status(403).json("Token is not valid!");
 
-    // 2. PREPARE THE SQL QUERY
+    // Consider if 'date' should be updated.
+    // If 'date' is creation_date, it should NOT be updated.
+    // If you want an 'updated_at' timestamp, it's better to have a separate column
+    // or use MySQL's ON UPDATE CURRENT_TIMESTAMP for that column.
+    // For now, let's assume 'date' is creation date and remove it from the update.
     const q =
-      "UPDATE posts SET `title` = ?, `img` = ?, `date` = ?, `content` = ?, `description` = ?, `category` = ? WHERE `id` = ? AND `uid` = ?";
+      "UPDATE posts SET `title` = ?, `img` = ?, `content` = ?, `description` = ?, `category` = ? WHERE `id` = ? AND `uid` = ?";
 
     const values = [
       req.body.title,
-      req.body.img,
-      req.body.date,
+      req.body.img,       // This will be the new or existing image path
       req.body.content,
       req.body.description,
       req.body.category,
-      req.params.id, // Post ID from the URL
-      userInfo.id, // User ID from the JWT
+      req.params.id,    // Post ID from the URL
+      userInfo.id,      // User ID from the JWT
     ];
 
-    // 3. EXECUTE THE QUERY
     db.query(q, values, (err, data) => {
       if (err) {
-        console.error("Database query error:", err);
-        return res.status(500).json(err);
+        console.error("Database query error in updatePost:", err);
+        // Consider sending a more structured error like in getPost
+        return res.status(500).json({ message: "Failed to update post.", error: err.message });
+      }
+      if (data.affectedRows === 0) {
+        return res.status(404).json("Post not found or user not authorized to update.");
       }
       return res.status(200).json("Post has been updated.");
     });

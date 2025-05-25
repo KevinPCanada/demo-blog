@@ -63,6 +63,10 @@ export const login = (req, res) => {
     res
       .cookie("access_token", token, {
         httpOnly: true,
+        path: "/",          // <-- ADD THIS: Makes cookie available for all paths on the domain
+        sameSite: "Lax",    // <-- ADD THIS: Explicitly set SameSite to Lax
+                            // For production with HTTPS, you might use "None" with Secure: true
+        // secure: false,   // Default is false, which is correct for HTTP. Explicitly false if needed.
       })
       .status(200)
       .json(other);
