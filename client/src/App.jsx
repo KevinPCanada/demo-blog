@@ -1,76 +1,56 @@
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
-import { AuthContextProvider } from '/src/context/AuthContext';
-import Home from "./pages/Home/Home";
-import Register from "./pages/Register/Register";
-import Login from "./pages/Login/Login";
-import Single from "./pages/Single/Single";
-import Write from "./pages/Write/Write";
-import Navbar from "./components/Navbar/Navbar";
-import Footer from "./components/Footer/Footer";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
-
-const Layout = () => {
-  return (
-    <>
-      <Navbar />
-      <Outlet />
-      <Footer />
-    </>
-  );
-};
-
-const AuthWrapper = ({ children }) => (
-  <AuthContextProvider>{children}</AuthContextProvider>
-);
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: (
-      <AuthWrapper>
-        <Layout />
-      </AuthWrapper>
-    ),
-    children: [
-      {
-        path: "/",
-        element: <Home />,
-      },
-      {
-        path: "/post/:id",
-        element: <Single />,
-      },
-      {
-        path: "/write",
-        element: <Write />,
-      },
-    ],
-  },
-  {
-    path: "/register",
-    element: (
-      <AuthWrapper>
-        <Register />
-      </AuthWrapper>
-    ),
-  },
-  {
-    path: "/login",
-    element: (
-      <AuthWrapper>
-        <Login />
-      </AuthWrapper>
-    ),
-  },
-]);
+import Login from "./components/Auth/Login";
+import Register from "./components/Auth/Register";
+import Header from "./components/Layout/Header";
+import PostForm from "./components/Posts/PostForm";
+import PostsList from "./components/Posts/PostsList";
+import PostView from "./components/Posts/PostView";
+import UserProfile from "./components/Profile/UserProfile";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   return (
-    <div className="app">
-      <div className="app-container">
-        <RouterProvider router={router} />
-      </div>
-    </div>
+    <AuthProvider>
+      <Router>
+        <div className="app">
+          <Header />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<PostsList />} />
+              <Route path="/post/:id" element={<PostView />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route
+                path="/create"
+                element={
+                  <ProtectedRoute>
+                    <PostForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/edit/:id"
+                element={
+                  <ProtectedRoute>
+                    <PostForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile/:id"
+                element={
+                  <ProtectedRoute>
+                    <UserProfile />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 
