@@ -25,12 +25,7 @@ const Header = () => {
               <button className="nav-link" onClick={() => navigate("/create")}>
                 Write Post
               </button>
-              <button
-                className="nav-link"
-                onClick={() => navigate(`/profile/${user.id}`)}
-              >
-                Profile
-              </button>
+        
               <button className="nav-link logout" onClick={handleLogout}>
                 Logout
               </button>

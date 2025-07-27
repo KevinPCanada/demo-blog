@@ -77,7 +77,7 @@ const PostsList = () => {
 
   return (
     <div className="posts-container">
-      <h1>Latest Blog Posts</h1>
+      <h1>Latest</h1>
       
       {/* Featured Latest Post */}
       {filteredPosts.length > 0 && (
