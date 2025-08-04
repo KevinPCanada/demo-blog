@@ -6,7 +6,6 @@ import Header from "./components/Layout/Header";
 import PostForm from "./components/Posts/PostForm";
 import PostsList from "./components/Posts/PostsList";
 import PostView from "./components/Posts/PostView";
-import UserProfile from "./components/Profile/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 
@@ -35,14 +34,6 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <PostForm />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profile/:id"
-                element={
-                  <ProtectedRoute>
-                    <UserProfile />
                   </ProtectedRoute>
                 }
               />
