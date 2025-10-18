@@ -33,7 +33,7 @@ body {
 
 /* Header styles */
 .header {
-  background: rgb(255, 250, 245);
+  background: #111827;
   border-bottom: 1px solid #e2e8f0;
   box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(10px);
@@ -58,7 +58,7 @@ body {
 }
 
 .logo h2 {
-  color: #111827;
+  color: white;
   font-size: 1.5rem;
   font-weight: 700;
   font-family: "Space Mono", serif;
@@ -68,12 +68,13 @@ body {
   display: flex;
   gap: 1rem;
   align-items: center;
+  
 }
 
 .nav-link {
   background: none;
   border: none;
-  color: #6b7280;
+  color: white;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
