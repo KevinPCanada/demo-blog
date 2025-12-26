@@ -12,7 +12,7 @@ const CustomDropdown = ({ value, onChange, options }) => {
     setIsOpen(false);
   };
 
-  const selectedOption = options.find(option => option.value === value);
+  const selectedOption = options.find((option) => option.value === value);
 
   return (
     <div className="custom-dropdown">
@@ -21,26 +21,33 @@ const CustomDropdown = ({ value, onChange, options }) => {
         className="dropdown-trigger"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className={selectedOption?.value ? 'selected' : 'placeholder'}>
-          {selectedOption?.label || 'Select a category'}
+        <span className={selectedOption?.value ? "selected" : "placeholder"}>
+          {selectedOption?.label || "Select a category"}
         </span>
-        <svg 
-          className={`dropdown-arrow ${isOpen ? 'open' : ''}`} 
-          fill="none" 
-          stroke="currentColor" 
+        <svg
+          className={`dropdown-arrow ${isOpen ? "open" : ""}`}
+          fill="none"
+          stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
-      
+
       {isOpen && (
         <div className="dropdown-menu">
           {options.map((option) => (
             <button
               key={option.value}
               type="button"
-              className={`dropdown-option ${option.value === value ? 'selected' : ''}`}
+              className={`dropdown-option ${
+                option.value === value ? "selected" : ""
+              }`}
               onClick={() => handleSelect(option.value)}
             >
               {option.label}
@@ -247,10 +254,19 @@ const PostForm = () => {
           {formData.img && (
             <div className="current-image">
               <p>Current image:</p>
-              <img 
-                src={`http://localhost:8800/${formData.img}`} 
-                alt="Current post image" 
-                style={{ maxWidth: '200px', maxHeight: '150px', objectFit: 'cover', marginBottom: '10px' }}
+              <img
+                src={
+                  formData.img.startsWith("http")
+                    ? formData.img
+                    : `http://localhost:8800/${formData.img}`
+                }
+                alt="Current post image"
+                style={{
+                  maxWidth: "200px",
+                  maxHeight: "150px",
+                  objectFit: "cover",
+                  marginBottom: "10px",
+                }}
               />
             </div>
           )}
@@ -262,14 +278,31 @@ const PostForm = () => {
               accept="image/*"
               onChange={handleFileUpload}
             />
-            <label htmlFor="file-upload" className={`file-upload-button ${formData.img ? 'has-file' : ''}`}>
-              <svg className="file-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            <label
+              htmlFor="file-upload"
+              className={`file-upload-button ${formData.img ? "has-file" : ""}`}
+            >
+              <svg
+                className="file-upload-icon"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
               </svg>
-              {formData.img ? 'Change Image' : 'Choose Image'}
+              {formData.img ? "Change Image" : "Choose Image"}
             </label>
           </div>
-          <small>{formData.img ? 'Upload a new image to replace the current one' : 'Upload an image to set as the post image'}</small>
+          <small>
+            {formData.img
+              ? "Upload a new image to replace the current one"
+              : "Upload an image to set as the post image"}
+          </small>
         </div>
 
         <div className="form-actions">

@@ -194,7 +194,8 @@ export const api = {
 
       if (response.ok) {
         const result = await response.json();
-        return { url: result.filePath, message: result.message };
+        
+        return { url: result.url }; 
       } else {
         const error = await response.json();
         throw new Error(error.error || "File upload failed");

@@ -62,6 +62,13 @@ const PostsList = () => {
     return description.substring(0, maxLength) + "...";
   };
 
+  // Smart Image URL Fix
+  const getImageUrl = (img) => {
+    if (!img) return "";
+    // If it starts with http, it's Cloudinary. If not, it's local.
+    return img.startsWith("http") ? img : `http://localhost:8800/${img}`;
+  };
+
   if (loading) {
     return <div className="loading">Loading posts...</div>;
   }
@@ -101,7 +108,7 @@ const PostsList = () => {
               {filteredPosts[0].img && (
                 <div className="featured-post-image">
                   <img
-                    src={`http://localhost:8800/${filteredPosts[0].img}`}
+                    src={getImageUrl(filteredPosts[0].img)}
                     alt={filteredPosts[0].title}
                   />
                 </div>
