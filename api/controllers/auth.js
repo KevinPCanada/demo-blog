@@ -54,7 +54,7 @@ export const login = (req, res) => {
     }
    
     // Generate a JWT token for successful login
-    const token = jwt.sign({ id: data[0].id }, "jwtkey");
+    const token = jwt.sign({ id: data[0].id }, process.env.JWT_KEY);
     
     // Remove password from user data before sending response
     const { password, ...other } = data[0];

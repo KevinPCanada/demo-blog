@@ -1,0 +1,22 @@
+# --- Dependencies ---
+node_modules/
+/api/node_modules/
+/client/node_modules/
+
+# --- Security (CRITICAL) ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# --- Build Outputs (Don't upload these) ---
+build/
+dist/
+
+# --- Misc / OS Files ---
+.DS_Store
+Thumbs.db
+.vscode/
+*.log
+npm-debug.log*

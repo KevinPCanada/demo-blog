@@ -68,7 +68,7 @@ export const addPost = (req, res) => {
   const token = req.cookies.access_token;
   if (!token) return res.status(401).json("Not authenticated!");
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
+  jwt.verify(token, process.env.JWT_KEY, (err, userInfo) => {
     // Ensure "jwtkey" is your actual secret
     if (err) return res.status(403).json("Token is not valid!");
 
@@ -105,7 +105,7 @@ export const deletePost = (req, res) => {
   const token = req.cookies.access_token;
   if (!token) return res.status(401).json("Not authenticated!");
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
+  jwt.verify(token, process.env.JWT_KEY, (err, userInfo) => {
     if (err) return res.status(403).json("Token is not valid!");
 
     const postId = req.params.id;
@@ -182,7 +182,7 @@ export const updatePost = (req, res) => {
   if (!token) return res.status(401).json("Not authenticated!");
 
   // IMPORTANT: Ensure this JWT key is the SAME as in addPost ("jwtkey")
-  jwt.verify(token, "jwtkey", (err, userInfo) => { // USE CONSISTENT JWT KEY
+  jwt.verify(token, process.env.JWT_KEY, (err, userInfo) => { // USE CONSISTENT JWT KEY
     if (err) return res.status(403).json("Token is not valid!");
 
     // Consider if 'date' should be updated.
