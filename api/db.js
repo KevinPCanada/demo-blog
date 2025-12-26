@@ -10,11 +10,11 @@ export const db = mysql.createConnection({
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
   ssl: {
-    rejectUnauthorized: true // REQUIRED FOR TiDB CLOUD
+    minVersion: "TLSv1.2",
+    rejectUnauthorized: true,
   },
-
   // Pool specific settings
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
 });
