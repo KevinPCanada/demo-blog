@@ -3,11 +3,11 @@ import express from 'express';
 import postRoutes from './routes/posts.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
-import uploadRoutes from './routes/upload.js'; // <--- 1. IMPORT UPLOAD ROUTES
+import uploadRoutes from './routes/upload.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import path from 'path';                       // <--- IMPORT PATH MODULE
-import { fileURLToPath } from 'url';           // <--- For __dirname in ES modules
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // For ES Modules, __dirname is not available directly.
 const __filename = fileURLToPath(import.meta.url);
@@ -15,35 +15,39 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-
 // --- CORS CONFIGURATION ---
 const corsOptions = {
-  origin: 'http://localhost:5173', // frontend origin
-  credentials: true,               // Allow cookies
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Explicitly allow PUT and OPTIONS
-  allowedHeaders: ['Content-Type', 'Authorization' /*, other headers if needed */ ] // Allow Content-Type
+  // We use an array so we can allow Localhost AND future Vercel URL
+  origin: [
+    "http://localhost:5173", 
+    // will add Vercel URL here later, e.g., "https://my-blog.vercel.app"
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 app.use(cors(corsOptions));
-// --- END OF CORS  ---
+// --- END OF CORS ---
 
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-
-// <--- 2. SERVE STATIC FILES --->
-// This makes files in 'api/public/' accessible.
-// e.g., http://localhost:8800/uploads/image.png will serve api/public/uploads/image.png
+// Serve static files (Optional now that I use Cloudinary, but good to keep for safety)
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use("/api/posts", postRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/upload", uploadRoutes); // <--- 3. USE UPLOAD ROUTES
+app.use("/api/upload", uploadRoutes);
 
-app.listen(8800, () => {
-  console.log('Server listening on http://localhost:8800');
-  console.log(`Static files (like uploads) will be served from: ${path.join(__dirname, 'public')}`);
-});
+// --- VERCEL DEPLOYMENT CONFIG ---
+// Only listen to port 8800 if we are NOT in production (i.e., we are on Localhost)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(8800, () => {
+    console.log('Server listening on http://localhost:8800');
+  });
+}
+
+export default app;
