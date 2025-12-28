@@ -1,5 +1,7 @@
-export const API_BASE_URL = "http://localhost:8800/api";
-
+export const API_BASE_URL = import.meta.env.PROD 
+  ? "/api" 
+  : "http://localhost:8800/api";
+  
 export const api = {
   // Authentication
   register: async (userData) => {
