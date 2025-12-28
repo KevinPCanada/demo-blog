@@ -61,6 +61,11 @@ const PostView = () => {
     });
   };
 
+  const getImageUrl = (img) => {
+    if (!img) return "";
+    return img.startsWith("http") ? img : `http://localhost:8800/${img}`;
+  };
+
   if (loading) {
     return <div className="loading">Loading post...</div>;
   }
