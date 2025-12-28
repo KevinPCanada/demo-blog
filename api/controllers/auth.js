@@ -3,74 +3,77 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 // Registration function
-export const register = (req, res) => {
-  console.log(req.body); // Log the body to verify fields
-  
-  // Check if the user already exists in the database
-  const query = "SELECT * FROM users WHERE email = ? OR username = ?";
-  db.query(query, [req.body.email, req.body.username], (err, data) => {
-    if (err) {
-      return res.status(500).json(err);
-    }
-    if (data.length) {
-      return res.status(409).json("User already exists");
-    }
+export const register = async (req, res) => {
+  try {
+    // 1. CHECK IF USER EXISTS
+    const q = "SELECT * FROM users WHERE email = ? OR username = ?";
     
-    // Hash the password using bcrypt for security
-    const saltRounds = 10;
-    const salt = bcrypt.genSaltSync(saltRounds);
+    // Serverless driver returns the data array directly
+    const existingUsers = await db.execute(q, [req.body.email, req.body.username]);
+
+    if (existingUsers.length > 0) {
+      return res.status(409).json("User already exists!");
+    }
+
+    // 2. HASH THE PASSWORD
+    const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(req.body.password, salt);
-    
-    // Insert the new user into the database
-    const insertQuery =
-      "INSERT INTO users (`email`, `username`, `password`) VALUES (?, ?, ?)";
-    const values = [
-      req.body.email,
-      req.body.username,
-      hash, // Store the hashed password
-    ];
-    db.query(insertQuery, values, (err, data) => {
-      if (err) return res.status(500).json(err);
-      return res.status(200).json("User has been created");
-    });
-  });
+
+    // 3. INSERT NEW USER
+    const insertQ = "INSERT INTO users(`username`,`email`,`password`) VALUES (?, ?, ?)";
+    const values = [req.body.username, req.body.email, hash];
+
+    await db.execute(insertQ, values);
+
+    return res.status(200).json("User has been created.");
+  } catch (err) {
+    console.error("Error in register:", err);
+    return res.status(500).json(err);
+  }
 };
 
-// Login function
-export const login = (req, res) => {
-  // SQL query to find the user by username
-  const query = "SELECT * FROM users WHERE username = ?";
-  db.query(query, [req.body.username], (err, data) => {
-    if (err) return res.status(500).json(err); // Server error
-    if (data.length === 0) return res.status(404).json("User not found!"); // User not found
-   
-    // Check if the provided password matches the stored hashed password
+export const login = async (req, res) => {
+  try {
+    // 1. CHECK IF USER EXISTS
+    const q = "SELECT * FROM users WHERE username = ?";
+    const users = await db.execute(q, [req.body.username]);
+
+    if (users.length === 0) {
+      return res.status(404).json("User not found!");
+    }
+
+    // 2. CHECK PASSWORD
+    // users[0] is the first user found
     const isPasswordCorrect = bcrypt.compareSync(
       req.body.password,
-      data[0].password
+      users[0].password
     );
+
     if (!isPasswordCorrect) {
-      return res.status(400).json("Wrong username or password"); // Incorrect password
+      return res.status(400).json("Wrong username or password!");
     }
-   
-    // Generate a JWT token for successful login
-    const token = jwt.sign({ id: data[0].id }, process.env.JWT_KEY);
-    
-    // Remove password from user data before sending response
-    const { password, ...other } = data[0];
-   
-    // Set the token as an HTTP-only cookie and send user data
+
+    // 3. GENERATE TOKEN
+    const token = jwt.sign({ id: users[0].id }, process.env.JWT_KEY);
+
+    // 4. SEPARATE PASSWORD FROM USER DATA
+    const { password, ...other } = users[0];
+
+    // 5. SEND COOKIE AND USER DATA
+    // We use "samesite: none" and "secure: true" for cross-site cookies (Vercel -> Backend)
     res
       .cookie("access_token", token, {
         httpOnly: true,
-        path: "/",          // <-- ADD THIS: Makes cookie available for all paths on the domain
-        sameSite: "Lax",    // <-- ADD THIS: Explicitly set SameSite to Lax
-                            // For production with HTTPS, you might use "None" with Secure: true
-        // secure: false,   // Default is false, which is correct for HTTP. Explicitly false if needed.
+        secure: true, // Required for Vercel/HTTPS
+        sameSite: "none", // Required for Cross-Site (Frontend vs Backend domains)
       })
       .status(200)
       .json(other);
-  });
+      
+  } catch (err) {
+    console.error("Error in login:", err);
+    return res.status(500).json(err);
+  }
 };
 
 // Logout function
