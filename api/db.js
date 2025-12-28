@@ -1,4 +1,5 @@
 import mysql from "mysql2";
+import { connect } from "@tidbcloud/serverless";
 import dotenv from "dotenv"; // Import dotenv
 
 dotenv.config(); // Load variables immediately
