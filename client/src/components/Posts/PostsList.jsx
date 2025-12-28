@@ -16,16 +16,19 @@ const PostsList = () => {
 
   useEffect(() => {
     filterPosts();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [posts, selectedCategory]);
 
   const fetchPosts = async () => {
     try {
       const postsData = await api.getAllPosts();
       setPosts(postsData);
-      
+
       // Extract unique categories
-      const uniqueCategories = ["All", ...new Set(postsData.map(post => post.category).filter(Boolean))];
+      const uniqueCategories = [
+        "All",
+        ...new Set(postsData.map((post) => post.category).filter(Boolean)),
+      ];
       setCategories(uniqueCategories);
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -40,7 +43,9 @@ const PostsList = () => {
     if (selectedCategory === "All") {
       setFilteredPosts(posts);
     } else {
-      setFilteredPosts(posts.filter(post => post.category === selectedCategory));
+      setFilteredPosts(
+        posts.filter((post) => post.category === selectedCategory)
+      );
     }
   };
 
@@ -85,7 +90,7 @@ const PostsList = () => {
   return (
     <div className="posts-container">
       <h1>Latest</h1>
-      
+
       {/* Featured Latest Post */}
       {filteredPosts.length > 0 && (
         <div className="featured-post-section">
@@ -95,14 +100,22 @@ const PostsList = () => {
           >
             <div className="featured-post-content">
               <div className="featured-post-text">
-                <div className="featured-post-category">{filteredPosts[0].category}</div>
-                <h2 className="featured-post-title">{filteredPosts[0].title}</h2>
+                <div className="featured-post-category">
+                  {filteredPosts[0].category}
+                </div>
+                <h2 className="featured-post-title">
+                  {filteredPosts[0].title}
+                </h2>
                 <p className="featured-post-description">
                   {truncateDescription(filteredPosts[0].description, 200)}
                 </p>
                 <div className="featured-post-meta">
-                  <span className="post-author">By {filteredPosts[0].authorName}</span>
-                  <span className="post-date">{formatDate(filteredPosts[0].date)}</span>
+                  <span className="post-author">
+                    By {filteredPosts[0].authorName}
+                  </span>
+                  <span className="post-date">
+                    {formatDate(filteredPosts[0].date)}
+                  </span>
                 </div>
               </div>
               {filteredPosts[0].img && (
@@ -117,7 +130,7 @@ const PostsList = () => {
           </article>
         </div>
       )}
-      
+
       {posts.length > 0 && (
         <div className="category-filter">
           <h3>Filter by Category:</h3>
@@ -125,7 +138,9 @@ const PostsList = () => {
             {categories.map((category) => (
               <button
                 key={category}
-                className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
+                className={`category-btn ${
+                  selectedCategory === category ? "active" : ""
+                }`}
                 onClick={() => handleCategoryChange(category)}
               >
                 {category}
@@ -134,7 +149,7 @@ const PostsList = () => {
           </div>
         </div>
       )}
-      
+
       {/* Remaining Posts */}
       {filteredPosts.length > 1 && (
         <div className="remaining-posts-section">
@@ -149,7 +164,7 @@ const PostsList = () => {
                 {post.img && (
                   <div className="post-image">
                     <img
-                      src={`http://localhost:8800/${post.img}`}
+                      src={getImageUrl(post.img)}
                       alt={post.title}
                     />
                   </div>
@@ -173,7 +188,7 @@ const PostsList = () => {
           </div>
         </div>
       )}
-      
+
       {filteredPosts.length === 0 && posts.length > 0 ? (
         <div className="empty-state">
           <h3>No posts found</h3>

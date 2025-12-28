@@ -97,12 +97,12 @@ const PostView = () => {
           <h1 className="post-view-title">{post.title}</h1>
           {post.img && (
             <div className="post-view-image">
-              <img src={`http://localhost:8800/${post.img}`} alt={post.title} />
+              <img src={getImageUrl(post.img)} alt={post.title} />
             </div>
           )}
           <div className="post-view-meta">
             <div className="post-author-info">
-             <span className="author">By {post.authorName}</span>
+              <span className="author">By {post.authorName}</span>
               <span className="category">Category: {post.category}</span>
               <span className="date">{formatDate(post.date)}</span>
             </div>
