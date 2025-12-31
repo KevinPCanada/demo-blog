@@ -7,7 +7,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/");
+    navigate("/login");
   };
 
   return (
@@ -17,9 +17,6 @@ const Header = () => {
           <h2>Everyday Bytes</h2>
         </div>
         <nav className="nav">
-          <button className="nav-link" onClick={() => navigate("/")}>
-            Home
-          </button>
           {user ? (
             <>
               <button className="nav-link" onClick={() => navigate("/create")}>
